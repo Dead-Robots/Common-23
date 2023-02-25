@@ -61,4 +61,4 @@ def _get_robot_id_from_file(path):
         raise ValueError('A valid robot was not found in the RobotID project whoami.txt')
 
 
-ROBOT = _get_robot_id_from_file("../RobotID/whoami.txt")
+ROBOT = _get_robot_id_from_file("../RobotID/bin/whoami.txt")
