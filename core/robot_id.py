@@ -1,7 +1,8 @@
 """
 Provides the ROBOT constant to be used to identify the robot in use
 """
-
+import json
+import os.path
 from enum import Enum
 from typing import Union, Tuple
 
@@ -50,6 +51,16 @@ class Robot(Enum):
     def is_yellow(self):
         return self is Robot.YELLOW
 
+    @staticmethod
+    def get_property(property_name):
+        return props.get(property_name)
+
+    @staticmethod
+    def set_property(property_name, value):
+        props[property_name] = value
+        with open("/home/root/Documents/KISS/DRS/RobotID/bin/props.json", "w+") as f:
+            json.dump(props, f)
+
 
 def _get_robot_id_from_file(path):
     try:
@@ -62,3 +73,14 @@ def _get_robot_id_from_file(path):
 
 
 ROBOT = _get_robot_id_from_file("/home/root/Documents/KISS/DRS/RobotID/bin/whoami.txt")
+
+# Persistent robot properties
+if os.path.exists("/home/root/Documents/KISS/DRS/RobotID/bin/props.json"):
+    with open("/home/root/Documents/KISS/DRS/RobotID/bin/props.json", 'r') as f:
+        try:
+            props = json.load(f)
+        except Exception:
+            print("Error reading properties, assuming none...")
+            props = {}
+else:
+    props = {}
