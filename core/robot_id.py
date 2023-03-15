@@ -52,11 +52,11 @@ class Robot(Enum):
         return self is Robot.YELLOW
 
     @staticmethod
-    def get_property(property_name):
+    def load(property_name):
         return props.get(property_name)
 
     @staticmethod
-    def set_property(property_name, value):
+    def store(property_name, value):
         props[property_name] = value
         with open("/home/root/Documents/KISS/DRS/RobotID/bin/props.json", "w+") as f:
             json.dump(props, f)
