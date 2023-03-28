@@ -32,6 +32,10 @@ class Robot(Enum):
                 pass
         raise ValueError(f"No choices provided for {self}")
 
+    # example:
+    # ROBOT.run(drive_straight, red=420)
+    # ROBOT.run(drive_straight, blue=420)
+    # ROBOT.run(drive_straight, yellow=420)
     def run(self, func: callable, **kwargs: Union[Tuple, None]):
         func(*self.choose(**kwargs))
 
