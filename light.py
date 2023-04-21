@@ -3,7 +3,7 @@ from kipr import push_button, msleep, analog
 START_LIGHT_THRESHOLD = 0
 
 
-def calibrate(port):
+def _calibrate(port):
     global START_LIGHT_THRESHOLD
     print("Press button with light on")
     while not push_button():
@@ -35,7 +35,7 @@ def calibrate(port):
     return True
 
 
-def wait_4(port):
+def _wait_4(port):
     print("waiting for light!! ")
     while analog(port) > START_LIGHT_THRESHOLD:
         pass
@@ -45,9 +45,9 @@ def wait_4_light(port, ignore=False):
     if ignore:
         wait_for_button()
         return
-    while not calibrate(port):
+    while not _calibrate(port):
         pass
-    wait_4(port)
+    _wait_4(port)
 
 
 def wait_for_button():
