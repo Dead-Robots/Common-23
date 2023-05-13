@@ -1,4 +1,4 @@
-from kipr import push_button, msleep, analog
+from kipr import push_button, msleep, analog, console_clear
 
 START_LIGHT_THRESHOLD = 0
 
@@ -7,27 +7,32 @@ def _calibrate(port):
     global START_LIGHT_THRESHOLD
     print("Press button with light on")
     while not push_button():
-        pass
+        light_on = analog(port)
+        console_clear()
+        print("On value =", light_on)
+        msleep(100)
     while push_button():
         pass
-    light_on = analog(port)
-    print("On value =", light_on)
+
     if light_on > 200:
         print("Bad calibration")
         return False
     msleep(1000)
     print("Press button with light off")
     while not push_button():
-        pass
+        console_clear()
+        print("On value =", light_on)
+        light_off = analog(port)
+        print("Off value =", light_off)
+        msleep(100)
     while push_button():
         pass
-    light_off = analog(port)
-    print("Off value =", light_off)
-    if light_off < 3000:
+
+    if light_off < 1400:
         print("Bad calibration")
         return False
 
-    if (light_off - light_on) < 2000:
+    if (light_off - light_on) < 900:
         print("Bad calibration")
         return False
     START_LIGHT_THRESHOLD = (light_off - light_on) / 2
@@ -36,9 +41,15 @@ def _calibrate(port):
 
 
 def _wait_4(port):
-    print("waiting for light!! ")
-    while analog(port) > START_LIGHT_THRESHOLD:
-        pass
+    i = 10
+    print("waiting for light!!", i)
+    while i > 0:
+        if analog(port) < START_LIGHT_THRESHOLD:
+            i = i - 1
+            print("Countdown:", i)
+        else:
+            i = 10
+        msleep(10)
 
 
 def wait_4_light(port, ignore=False):
