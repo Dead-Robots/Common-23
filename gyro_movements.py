@@ -61,3 +61,17 @@ def gyro_turn_test(left_speed, right_speed, angle=90, iterations=4):
     for x in range(iterations):
         gyro_turn(left_speed, right_speed, angle)
         msleep(1000)
+
+def gyro_demo():
+    # pivot
+    gyro_turn_test(0, 100, 90, 1)
+    wait_for_button('waiting for button')
+    # both wheels
+    gyro_turn_test(-100, 100, 90, 1)
+    wait_for_button('waiting for button')
+    # 180 turns
+    # pivot
+    gyro_turn_test(0, 100, 180, 1)
+    wait_for_button('waiting for button')
+    # both wheels
+    gyro_turn_test(-100, 100, 180, 1)
