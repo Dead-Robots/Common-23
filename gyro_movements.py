@@ -72,9 +72,7 @@ def gyro_turn_test(left_speed, right_speed, angle=90, iterations=1):
 
 def straight_drive(speed, condition):
     speed = int(round(speed*0.95, 0))
-    drive(speed, speed)
-    start_time = time.time()
-    previous_time = start_time
+    previous_time = time.time()
     integral_error_adjustment = 0.0
     while condition():
         current_gyro = gyroscope()
