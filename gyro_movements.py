@@ -85,16 +85,31 @@ def straight_drive(speed, condition):
         msleep(10)
     stop()
 
+
 def gyro_demo():
     # pivot
-    gyro_turn_test(0, 100, 90, 1)
-    wait_for_button('waiting for button')
-    # both wheels
-    gyro_turn_test(-100, 100, 90, 1)
-    wait_for_button('waiting for button')
+    # gyro_turn_test(0, 100, 90, 1)
+    # wait_for_button('waiting for button')
+    # # both wheels
+    # gyro_turn_test(-100, 100, 90, 1)
+    # wait_for_button('waiting for button')
     # 180 turns
     # pivot
-    gyro_turn_test(0, 100, 180, 1)
-    wait_for_button('waiting for button')
+    gyro_turn_test(100, -100, 90, 1)
+    msleep(1000)
     # both wheels
-    gyro_turn_test(-100, 100, 180, 1)
+    gyro_turn_test(100, -100, 90, 1)
+    msleep(1000)
+    gyro_turn_test(100, -100, 90, 1)
+    msleep(1000)
+    gyro_turn_test(100, -100, 90, 1)
+    wait_for_button("waiting for button")
+    gyro_turn_test(-100, 100, 90, 1)
+    msleep(1000)
+    # both wheels
+    gyro_turn_test(-100, 100, 90, 1)
+    msleep(1000)
+    gyro_turn_test(-100, 100, 90, 1)
+    msleep(1000)
+    gyro_turn_test(-100, 100, 90, 1)
+    
