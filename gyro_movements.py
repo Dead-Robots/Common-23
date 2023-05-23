@@ -13,6 +13,7 @@ is_init = False
 error_proportion = 1.0
 error_integral_multiplier = 1.0
 
+
 def calibrate_gyro():
     total = 0
     for x in range(50):
@@ -69,11 +70,8 @@ def gyro_turn_test(left_speed, right_speed, angle=90, iterations=1):
         msleep(1000)
 
 
-def straight_drive(speed, condition):
-    speed = int(round(speed*0.95, 0))
-    drive(speed, speed)
-    start_time = time.time()
-    previous_time = start_time
+def straight_drive(speed, condition, stop_when_finished=True):
+    previous_time = time.time()
     integral_error_adjustment = 0.0
     while condition():
         current_gyro = gyroscope()
@@ -81,9 +79,19 @@ def straight_drive(speed, condition):
         marginal_time = current_time - previous_time
         gyro_error_adjustment = error_proportion * current_gyro
         integral_error_adjustment += error_integral_multiplier * current_gyro * marginal_time
-        drive(speed, speed + gyro_error_adjustment + integral_error_adjustment)
+        if speed > 0:
+            if speed + gyro_error_adjustment + integral_error_adjustment <= 100:
+                drive(speed, speed + gyro_error_adjustment + integral_error_adjustment)
+            else:
+                drive(speed - gyro_error_adjustment - integral_error_adjustment, speed)
+        else:
+            if speed - gyro_error_adjustment - integral_error_adjustment >= -100:
+                drive(speed - gyro_error_adjustment - integral_error_adjustment, speed)
+            else:
+                drive(speed, speed + gyro_error_adjustment + integral_error_adjustment)
         msleep(10)
-    stop()
+    if stop_when_finished:
+        stop()
 
 
 def gyro_demo():
@@ -112,4 +120,3 @@ def gyro_demo():
     gyro_turn_test(-100, 100, 90, 1)
     msleep(1000)
     gyro_turn_test(-100, 100, 90, 1)
-    
