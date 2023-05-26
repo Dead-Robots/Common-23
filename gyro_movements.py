@@ -1,7 +1,6 @@
 import time
 from kipr import msleep, gyro_z
 from typing import Optional, Callable
-
 from utilities import wait_for_button
 
 error_multiplier = 1.0
@@ -43,7 +42,7 @@ def gyro_turn(left_speed, right_speed, angle):
 
 
 def gyro_init(drive_function, stop_function, momentum_adjustment=0, gyro_error_adjustment=0.95,
-              drive_straight_error_proportion=0.1, drive_straight_integral_multiplier=0):
+              straight_drive_error_proportion=0.1, straight_drive_integral_multiplier=0):
     global error_multiplier
     global momentum_multiplier
     global drive
@@ -60,8 +59,8 @@ def gyro_init(drive_function, stop_function, momentum_adjustment=0, gyro_error_a
     error_multiplier = gyro_error_adjustment
     momentum_multiplier = momentum_adjustment
     is_init = True
-    error_proportion = drive_straight_error_proportion
-    error_integral_multiplier = drive_straight_integral_multiplier
+    error_proportion = straight_drive_error_proportion
+    error_integral_multiplier = straight_drive_integral_multiplier
 
 
 def gyro_turn_test(left_speed, right_speed, angle=90, iterations=1):
