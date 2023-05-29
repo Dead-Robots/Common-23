@@ -49,7 +49,8 @@ def check_init():
         exit(0)
 
 
-def gyro_init(drive_function, stop_function, get_motor_position_function, push_sensor_function, gyro_turn_momentum_adjustment=0.0, gyro_turn_error_adjustment=1.0,
+def gyro_init(drive_function, stop_function, get_motor_positions_function, push_sensor_function,
+              gyro_turn_momentum_adjustment=0.0, gyro_turn_error_adjustment=1.0,
               straight_drive_error_proportion=0.13, straight_drive_integral_multiplier=0.005):
     global error_multiplier
     global momentum_multiplier
@@ -71,7 +72,7 @@ def gyro_init(drive_function, stop_function, get_motor_position_function, push_s
     is_init = True
     error_proportion = straight_drive_error_proportion
     error_integral_multiplier = straight_drive_integral_multiplier
-    get_motor_positions = get_motor_position_function
+    get_motor_positions = get_motor_positions_function
     push_sensor = push_sensor_function
 
 
@@ -137,8 +138,12 @@ def calibrate_straight_drive_distance(robot_length_inches, total_inches=94):
 
 
 def straight_drive_distance(speed, inches, stop_when_finished=True):
-    with open(os.path.expanduser("~/straight.txt")) as file:
-        straight_drive_distance_proportion = file.read()
+    try:
+        with open(os.path.expanduser("~/straight.txt"), "r") as straight_file:
+            straight_drive_distance_proportion = float(straight_file.read())
+    except FileNotFoundError:
+        print("Warning, straight drive distance not calibrated")
+        exit(0)
     start_position = sum(get_motor_positions())
     distance_adjustment = ROBOT.choose(
         red=0.6,
