@@ -1,7 +1,9 @@
 import time
 import os
+from math import copysign
+
 from common import ROBOT
-from kipr import msleep, gyro_z, digital
+from kipr import msleep, gyro_z
 from typing import Optional, Callable, Tuple
 from utilities import wait_for_button
 
@@ -118,19 +120,19 @@ def straight_drive(speed, condition, stop_when_finished=True):
         stop()
 
 
-def calibrate_straight_drive_distance(robot_length_inches, total_inches=94):
+def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=100, total_inches=94):
     start_position = sum(get_motor_positions())
 
     def condition():
         return not push_sensor()
 
-    straight_drive(100, condition)
+    straight_drive(int(copysign(speed, direction)), condition)
     with open(os.path.expanduser("~/straight.txt"), "w+") as file:
         file.write(
             str((sum(get_motor_positions()) - start_position)
                 / (total_inches - robot_length_inches)))
     msleep(500)
-    straight_drive_distance(-100, total_inches/2)
+    straight_drive_distance(int(-1*copysign(speed, direction)), total_inches/2)
     with open(os.path.expanduser("~/straight.txt")) as file:
         proportion = file.read()
     print(f"Straight drive distance calibrated. {proportion} ticks per inch.")
@@ -138,18 +140,12 @@ def calibrate_straight_drive_distance(robot_length_inches, total_inches=94):
 
 
 def straight_drive_distance(speed, inches, stop_when_finished=True):
-    try:
-        with open(os.path.expanduser("~/straight.txt"), "r") as straight_file:
-            straight_drive_distance_proportion = float(straight_file.read())
-    except FileNotFoundError:
-        print("Warning, straight drive distance not calibrated")
-        exit(0)
     start_position = sum(get_motor_positions())
     distance_adjustment = ROBOT.choose(
-        red=0.6,
-        blue=0.6,
-        yellow=0.6,
-        green=0.6
+        red=0.0,
+        blue=0.0,
+        yellow=0.0,
+        green=0.0
     )
 
     def condition():
@@ -187,3 +183,11 @@ def gyro_demo():
     gyro_turn_test(-100, 100, 90, 1)
     msleep(1000)
     gyro_turn_test(-100, 100, 90, 1)
+
+
+try:
+    with open(os.path.expanduser("~/straight.txt"), "r") as straight_file:
+        straight_drive_distance_proportion = float(straight_file.read())
+except FileNotFoundError:
+    print("Warning, straight drive distance not calibrated")
+    exit(0)
