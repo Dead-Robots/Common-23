@@ -97,6 +97,7 @@ def straight_drive(speed, condition, stop_when_finished=True):
         current_gyro = gyroscope()
         current_time = time.time()
         marginal_time = current_time - previous_time
+        previous_time = current_time
         gyro_error_adjustment = error_proportion * current_gyro
         integral_error_adjustment += error_integral_multiplier * current_gyro * marginal_time
 
