@@ -140,10 +140,11 @@ def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=10
             str(abs((sum(get_motor_positions()) - start_position)
                 / (total_inches - robot_length_inches))))
     msleep(500)
-    straight_drive_distance(int(-1*copysign(speed, direction)), total_inches/2)
     with open(os.path.expanduser("~/straight.txt")) as file:
         proportion = file.read()
     print(f"Straight drive distance calibrated. {proportion} ticks per inch.")
+    wait_for_button("Press button to drive halfway back")
+    straight_drive_distance(-1*copysign(speed, direction), (total_inches-robot_length_inches)/2)
     exit(0)
 
 
@@ -153,7 +154,6 @@ def straight_drive_distance(speed, inches, stop_when_finished=True):
 
     def condition():
         left, right = get_motor_positions()
-
         return abs(left + right - start_position) \
             < (abs(inches) - abs(distance_adjustment * (speed / 100.0))) * straight_drive_distance_proportion
 
@@ -179,4 +179,3 @@ try:
         straight_drive_distance_proportion = float(straight_file.read())
 except FileNotFoundError:
     print("Warning, straight drive distance not calibrated")
-    exit(0)
