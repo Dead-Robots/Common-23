@@ -17,6 +17,7 @@ error_proportion = 1.0
 error_integral_multiplier = 1.0
 get_motor_positions: Optional[Callable[[], Tuple[int, int]]] = None
 push_sensor: Optional[Callable[[], bool]] = None
+distance_adjustment = 0.0
 
 
 def calibrate_gyro():
@@ -32,7 +33,7 @@ def gyroscope():
     return gyro_z() - gyro_offset
 
 
-def gyro_turn(left_speed, right_speed, angle):
+def gyro_turn(left_speed, right_speed, angle, stop_when_finished=True):
     check_init()
     old_time = time.time()
     drive(left_speed, right_speed)
@@ -42,7 +43,9 @@ def gyro_turn(left_speed, right_speed, angle):
         current_turned_angle += error_multiplier * gyroscope() * (time.time() - old_time) / 8
         old_time = time.time()
         msleep(10)
-    stop()
+    if stop_when_finished:
+        stop()
+        msleep(500)
 
 
 def check_init():
@@ -53,7 +56,8 @@ def check_init():
 
 def gyro_init(drive_function, stop_function, get_motor_positions_function, push_sensor_function,
               gyro_turn_momentum_adjustment=0.0, gyro_turn_error_adjustment=1.0,
-              straight_drive_error_proportion=0.13, straight_drive_integral_multiplier=0.005):
+              straight_drive_error_proportion=0.13, straight_drive_integral_multiplier=0.005,
+              straight_drive_distance_momentum_adjustment=0.0):
     global error_multiplier
     global momentum_multiplier
     global drive
@@ -63,6 +67,7 @@ def gyro_init(drive_function, stop_function, get_motor_positions_function, push_
     global error_integral_multiplier
     global get_motor_positions
     global push_sensor
+    global distance_adjustment
     wait_for_button("Press button to calibrate gyro. DO NOT MOVE ROBOT!")
     msleep(500)
     calibrate_gyro()
@@ -76,6 +81,7 @@ def gyro_init(drive_function, stop_function, get_motor_positions_function, push_
     error_integral_multiplier = straight_drive_integral_multiplier
     get_motor_positions = get_motor_positions_function
     push_sensor = push_sensor_function
+    distance_adjustment = straight_drive_distance_momentum_adjustment
 
 
 def gyro_turn_test(left_speed, right_speed, angle=90, iterations=1):
@@ -119,6 +125,7 @@ def straight_drive(speed, condition, stop_when_finished=True):
         msleep(10)
     if stop_when_finished:
         stop()
+        msleep(500)
 
 
 def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=100, total_inches=94):
@@ -130,8 +137,8 @@ def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=10
     straight_drive(int(copysign(speed, direction)), condition)
     with open(os.path.expanduser("~/straight.txt"), "w+") as file:
         file.write(
-            str((sum(get_motor_positions()) - start_position)
-                / (total_inches - robot_length_inches)))
+            str(abs((sum(get_motor_positions()) - start_position)
+                / (total_inches - robot_length_inches))))
     msleep(500)
     straight_drive_distance(int(-1*copysign(speed, direction)), total_inches/2)
     with open(os.path.expanduser("~/straight.txt")) as file:
@@ -142,12 +149,7 @@ def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=10
 
 def straight_drive_distance(speed, inches, stop_when_finished=True):
     start_position = sum(get_motor_positions())
-    distance_adjustment = ROBOT.choose(
-        red=0.0,
-        blue=0.0,
-        yellow=0.0,
-        green=0.0
-    )
+    global distance_adjustment
 
     def condition():
         left, right = get_motor_positions()
@@ -167,23 +169,9 @@ def gyro_demo():
     # wait_for_button('waiting for button')
     # 180 turns
     # pivot
-    gyro_turn_test(100, -100, 90, 1)
-    msleep(1000)
-    # both wheels
-    gyro_turn_test(100, -100, 90, 1)
-    msleep(1000)
-    gyro_turn_test(100, -100, 90, 1)
-    msleep(1000)
-    gyro_turn_test(100, -100, 90, 1)
+    gyro_turn_test(25, -25, 90, 4)
     wait_for_button("waiting for button")
-    gyro_turn_test(-100, 100, 90, 1)
-    msleep(1000)
-    # both wheels
-    gyro_turn_test(-100, 100, 90, 1)
-    msleep(1000)
-    gyro_turn_test(-100, 100, 90, 1)
-    msleep(1000)
-    gyro_turn_test(-100, 100, 90, 1)
+    gyro_turn_test(-25, 25, 90, 4)
 
 
 try:
