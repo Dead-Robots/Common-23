@@ -128,7 +128,7 @@ def straight_drive(speed, condition, stop_when_finished=True):
         msleep(500)
 
 
-def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=100, total_inches=94):
+def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=80, total_inches=94):
     start_position = sum(get_motor_positions())
 
     def condition():
