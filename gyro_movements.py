@@ -78,8 +78,8 @@ def check_init():
         exit(0)
 
 
-def gyro_init(drive_function, stop_function, get_motor_positions_function, push_sensor_function, gyro_turn_error_adjustment=1.0,
-              gyro_turn_momentum_adjustment=0.0,
+def gyro_init(drive_function, stop_function, get_motor_positions_function, push_sensor_function,
+              gyro_turn_error_adjustment=1.0, gyro_turn_momentum_adjustment=0.0,
               straight_drive_error_adjustment=0.13, straight_drive_integral_adjustment=0.3,
               straight_drive_distance_momentum_adjustment=0.0):
     """
