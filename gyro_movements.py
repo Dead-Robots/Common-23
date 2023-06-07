@@ -21,6 +21,9 @@ distance_adjustment = 0.0
 
 
 def calibrate_gyro():
+    """
+        Measures and saves the gyro offset value
+    """
     total = 0
     for x in range(50):
         total = total + gyro_z()
@@ -30,10 +33,27 @@ def calibrate_gyro():
 
 
 def gyroscope():
+    """
+        Returns the adjusted gyro value
+    """
     return gyro_z() - gyro_offset
 
 
 def gyro_turn(left_speed, right_speed, angle, stop_when_finished=True):
+    """
+        Drives with the motor speed parameters until the robot has turned angle degrees
+
+
+        :param left_speed: Speed of the left motor. Accepts integers in the range from -100 to 100,
+        inclusive.
+
+        :param right_speed: Speed of the right motor. Accepts integers in the range from -100 to 100,
+        inclusive.
+
+        :param angle: The amount of degrees to be turned. Accepts any integers or floats, but sign does not matter.
+
+        :param stop_when_finished: Determines if the robot should stop when it finishes turning. Defaults to True.
+    """
     check_init()
     old_time = time.time()
     drive(left_speed, right_speed)
@@ -49,15 +69,65 @@ def gyro_turn(left_speed, right_speed, angle, stop_when_finished=True):
 
 
 def check_init():
+    """
+        Prints "GYRO NOT INITIALIZED!" and exits the program if the gyro has not been initialized.
+        gyro_init() must be run to avoid this error.
+    """
     if not is_init:
         print("GYRO NOT INITIALIZED!")
         exit(0)
 
 
-def gyro_init(drive_function, stop_function, get_motor_positions_function, push_sensor_function,
-              gyro_turn_momentum_adjustment=0.0, gyro_turn_error_adjustment=1.0,
-              straight_drive_error_proportion=0.13, straight_drive_integral_multiplier=0.005,
+def gyro_init(drive_function, stop_function, get_motor_positions_function, push_sensor_function, gyro_turn_error_adjustment=1.0,
+              gyro_turn_momentum_adjustment=0.0,
+              straight_drive_error_adjustment=0.13, straight_drive_integral_adjustment=0.3,
               straight_drive_distance_momentum_adjustment=0.0):
+    """
+        Calibrates the gyroscope and sets the values of various constants that are used for gyro turns and straight
+        drives.
+        This function must have been called before any gyro turns or straight drives are performed.
+
+
+        :param drive_function: A function that drives the robot. It takes the left motor speed and right motor speed as
+            parameters.
+
+        :param stop_function: A function that stops the robot. It takes no parameters.
+
+        :param get_motor_positions_function: A function that returns a tuple of the left and right motor position. It
+            takes no parameters.
+
+        :param push_sensor_function: A function that returns true if the push sensor of the robot is being pressed. It
+            takes no parameters.
+
+        :param gyro_turn_error_adjustment: Used in gyro turns to inversely scale the angle that the robot is trying to
+            turn to account for regular error in the gyroscope. To calibrate, have the robot execute slow gyro turns.
+            If the robot turns too far, decrease the value, and if the robot does not turn enough, increase the value.
+
+        :param gyro_turn_momentum_adjustment: Used in gyro turns to reduce the angle that the robot is trying to turn
+            in order to account for momentum. The effect of this value scales with speed, so it has almost no effect on
+            slower turns. To calibrate, make sure the gyro_turn_error_adjustment parameter is calibrated and then have
+            the robot turn at high speeds. If the robot overturns at high speeds, increase the value, and if the robot
+            doesn't turn enough at high speeds, decrease the value. If this value is significantly changed, check that
+            the turns are still accurate at lower speeds. If they are not accurate at lower speeds, recalibrate the
+            gyro_turn_error_adjustment.
+
+        :param straight_drive_error_adjustment: Used in straight drives to adjust the amount that the robot corrects
+            its motor speeds based on the current gyroscope value. To calibrate, set the
+            straight_drive_integral_multiplier to zero and set it to the lowest point at which increasing it makes no
+            noteworthy difference. Setting it too high will make the drives shaky. The robot will arc while calibrating
+            this, but that will be fixed when the straight_drive_integral_multiplier is changed back from zero to its
+            previous value.
+
+        :param straight_drive_integral_adjustment: Used in straight drives to adjust how much the robot corrects its
+            motor speeds based on the amount that it has turned so far throughout the drive so far. Increase this value
+            if the robot is not driving adequately straight, but setting it too high will cause the drive to become
+            shaky.
+
+        :param straight_drive_distance_momentum_adjustment: Used for distance straight drives to reduce the distance
+            that the robot tries to drive based on how fast it's moving. If the robot is driving the correct distances
+            at low speeds and driving too far at high speeds, increase this value to fix the problem. Setting this value
+            too high will cause the robot to undershoot its drive distances at high speeds.
+    """
     global error_multiplier
     global momentum_multiplier
     global drive
@@ -77,20 +147,45 @@ def gyro_init(drive_function, stop_function, get_motor_positions_function, push_
     error_multiplier = gyro_turn_error_adjustment
     momentum_multiplier = gyro_turn_momentum_adjustment
     is_init = True
-    error_proportion = straight_drive_error_proportion
-    error_integral_multiplier = straight_drive_integral_multiplier
+    error_proportion = straight_drive_error_adjustment
+    error_integral_multiplier = straight_drive_integral_adjustment
     get_motor_positions = get_motor_positions_function
     push_sensor = push_sensor_function
     distance_adjustment = straight_drive_distance_momentum_adjustment
 
 
 def gyro_turn_test(left_speed, right_speed, angle=90, iterations=1):
+    """
+        Executes a given number of gyro turns with set motor speeds and angles. There is a one-second pause between each
+        turn.
+
+
+        :param left_speed: Speed of the left motor. Accepts integers in the range 0-100, inclusive.
+
+        :param right_speed: Speed of the right motor. Accepts integers in the range 0-100, inclusive.
+
+        :param angle: The amount of degrees to be turned. Accepts any integers or floats, but sign does not matter.
+
+        :param iterations: The number of gyro turns to be performed.
+    """
     for x in range(iterations):
         gyro_turn(left_speed, right_speed, angle)
         msleep(1000)
 
 
 def straight_drive(speed, condition, stop_when_finished=True):
+    """
+    Drives straight at a given speed while an input condition is True.
+
+
+    :param speed: The speed at which the robot should be driving. Accepts integers in the range from -100 to 100,
+        inclusive.
+
+    :param condition: A function that returns a boolean value. The robot will continue driving until the function
+        returns false.
+
+    :param stop_when_finished: Determines if the robot should stop when it finishes driving. Defaults to True.
+    """
     check_init()
     if abs(speed) < 20:
         speed = 20 if speed > 0 else -20
@@ -129,6 +224,21 @@ def straight_drive(speed, condition, stop_when_finished=True):
 
 
 def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=80, total_inches=94):
+    """
+        Straight drives and records the number of motor ticks that have passed until the push sensor is pressed.
+
+
+        :param robot_length_inches: The distance from the end of the push sensor (while it is being pressed) to the
+            opposite end of the robot.
+
+        :param direction: The direction for the robot to drive. Set to 1 to calibrate lego and -1 to calibrate create.
+            Defaults to 1.
+
+        :param speed: The speed at which the robot should drive during calibration.
+
+        :param total_inches: The distance in inches being used to calibrate the drive distance. Defaults to the 94, the
+            full length of the game board.
+    """
     start_position = sum(get_motor_positions())
 
     def condition():
@@ -149,6 +259,17 @@ def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=80
 
 
 def straight_drive_distance(speed, inches, stop_when_finished=True):
+    """
+        Drives straight at a given speed for a given distance.
+
+
+        :param speed: The speed at which the robot should be driving. Accepts integers in the range from -100 to 100,
+            inclusive.
+
+        :param inches: The number of inches for the robot to drive.
+
+        :param stop_when_finished: Determines if the robot should stop when it finishes driving. Defaults to True.
+    """
     start_position = sum(get_motor_positions())
     global distance_adjustment
 
@@ -175,7 +296,9 @@ def gyro_demo():
 
 
 try:
+    # Reads the straight_drive_distance_proportion from straight.txt if straight.txt exists.
     with open(os.path.expanduser("~/straight.txt"), "r") as straight_file:
         straight_drive_distance_proportion = float(straight_file.read())
 except FileNotFoundError:
+    # Prints a warning if straight.txt is not found. If this happens, run calibrate_straight_drive_distance().
     print("Warning, straight drive distance not calibrated")
