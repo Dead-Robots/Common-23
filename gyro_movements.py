@@ -1,8 +1,6 @@
 import time
 import os
 from math import copysign
-
-from common import ROBOT
 from kipr import msleep, gyro_z
 from typing import Optional, Callable, Tuple
 from utilities import wait_for_button
@@ -119,7 +117,7 @@ def gyro_init(drive_function, stop_function, get_motor_positions_function, push_
             previous value.
 
         :param straight_drive_integral_adjustment: Used in straight drives to adjust how much the robot corrects its
-            motor speeds based on the amount that it has turned so far throughout the drive so far. Increase this value
+            motor speeds based on the amount that it has turned throughout the drive so far. Increase this value
             if the robot is not driving adequately straight, but setting it too high will cause the drive to become
             shaky.
 
