@@ -214,7 +214,7 @@ def straight_drive(speed, condition, stop_when_finished=True):
             left_speed = speed
 
         # Drive
-        drive(left_speed, right_speed)
+        drive(int(round(left_speed, 0)), int(round(right_speed, 0)))
         msleep(10)
     if stop_when_finished:
         stop()
