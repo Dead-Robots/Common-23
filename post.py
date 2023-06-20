@@ -20,25 +20,30 @@ def post_core(
         print("Running initial setup.")
         initial_setup()
         print("Initial setup complete.")
+    msleep(1500)
+    if push_button():
+        print("POST aborted, running program.")
         msleep(500)
-    while not push_button():
-        print("Testing servos.")
-        test_servos()
-        print("Testing motors.")
-        test_motors()
-        print("Testing sensors.")
-        test_sensors()
-        print("POST complete.")
-        print("Press 'A' to run the robot.\nPress 'B' to re-run the POST\nPress 'C' to calibrate drive distances.")
-        a, b, c = a_button(), b_button(), c_button()
-        while not (a or b or c):
+    else:
+        while True:
+            print("Testing servos.")
+            test_servos()
+            print("Testing motors.")
+            test_motors()
+            print("Testing sensors.")
+            test_sensors()
+            print("POST complete.")
+            print("Press 'A' to run the robot.\nPress 'B' to re-run the POST\nPress 'C' to calibrate drive distances.")
             a, b, c = a_button(), b_button(), c_button()
-        while a_button() or b_button() or c_button():
-            pass
-        if a:
-            break
-        elif c:
-            if calibration_function:
-                calibration_function()
-            else:
-                raise Exception("No calibration function provided.")
+            while not (a or b or c):
+                a, b, c = a_button(), b_button(), c_button()
+            while a_button() or b_button() or c_button():
+                pass
+            if a:
+                break
+            elif c:
+                if calibration_function:
+                    calibration_function()
+                else:
+                    raise Exception("No calibration function provided.")
+    msleep(500)
