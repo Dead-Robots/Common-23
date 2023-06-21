@@ -69,7 +69,7 @@ class Robot(Enum):
 def _get_robot_id_from_file(path):
     try:
         with open(path, 'r') as f:
-            return Robot(f.read())
+            return Robot(f.read().strip())
     except FileNotFoundError:
         raise FileNotFoundError('The whoami.txt file was not found in the RobotID project')
     except ValueError:

@@ -1,3 +1,5 @@
+import os
+
 from kipr import a_button, b_button, c_button, msleep, push_button
 
 
@@ -21,29 +23,33 @@ def post_core(
         initial_setup()
         print("Initial setup complete.")
     msleep(1500)
-    if push_button():
-        print("POST aborted, running program.")
-        msleep(500)
-    else:
-        while True:
-            print("Testing servos.")
-            test_servos()
-            print("Testing motors.")
-            test_motors()
-            print("Testing sensors.")
-            test_sensors()
-            print("POST complete.")
-            print("Press 'A' to run the robot.\nPress 'B' to re-run the POST\nPress 'C' to calibrate drive distances.")
+
+    while not push_button():
+
+        print("Press 'A' to run the robot.\nPress 'B' to re-run the POST\nPress 'C' to calibrate drive distances.")
+        a, b, c = a_button(), b_button(), c_button()
+        while not (a or b or c or push_button()):
             a, b, c = a_button(), b_button(), c_button()
-            while not (a or b or c):
-                a, b, c = a_button(), b_button(), c_button()
-            while a_button() or b_button() or c_button():
-                pass
-            if a:
-                break
-            elif c:
-                if calibration_function:
-                    calibration_function()
-                else:
-                    raise Exception("No calibration function provided.")
+        while a_button() or b_button() or c_button():
+            pass
+        if a:
+            break
+        elif b:
+            try:
+                # Reads the straight_drive_distance_proportion from straight.txt if straight.txt exists.
+                with open(os.path.expanduser("~/straight.txt"), "r") as straight_file:
+                    print("Testing servos.")
+                    test_servos()
+                    print("Testing motors.")
+                    test_motors()
+                    print("Testing sensors.")
+                    test_sensors()
+                    print("POST complete.")
+            except FileNotFoundError:
+                print("Aborting POST, straight.txt was not found.")
+        elif c:
+            if calibration_function:
+                calibration_function()
+            else:
+                raise Exception("No calibration function provided.")
     msleep(500)
