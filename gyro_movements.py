@@ -99,7 +99,7 @@ def gyro_init(drive_function, stop_function, get_motor_positions_function, push_
 
         :param gyro_turn_error_adjustment: Used in gyro turns to inversely scale the angle that the robot is trying to
             turn to account for regular error in the gyroscope. To calibrate, have the robot execute slow gyro turns.
-            If the robot turns too far, decrease the value, and if the robot does not turn enough, increase the value.
+            If the robot turns too far, increase the value, and if the robot does not turn enough, decrease the value.
 
         :param gyro_turn_momentum_adjustment: Used in gyro turns to reduce the angle that the robot is trying to turn
             in order to account for momentum. The effect of this value scales with speed, so it has almost no effect on
@@ -136,7 +136,7 @@ def gyro_init(drive_function, stop_function, get_motor_positions_function, push_
     global get_motor_positions
     global push_sensor
     global distance_adjustment
-    wait_for_button("Press button to calibrate gyro. DO NOT MOVE ROBOT!")
+    print("Calibrating gyroscope. DO NOT MOVE ROBOT!")
     msleep(500)
     calibrate_gyro()
     msleep(500)
@@ -253,7 +253,8 @@ def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=80
     print(f"Straight drive distance calibrated. {proportion} ticks per inch.")
     wait_for_button("Press button to drive halfway back")
     straight_drive_distance(-1*copysign(speed, direction), (total_inches-robot_length_inches)/2)
-    exit(0)
+    wait_for_button()
+    gyro_turn(-80, 80, 180)
 
 
 def straight_drive_distance(speed, inches, stop_when_finished=True):
