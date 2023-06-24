@@ -1,7 +1,7 @@
 import time
 import os
 from math import copysign
-from kipr import msleep, gyro_z
+from kipr import msleep, gyro_z, disable_servos
 from typing import Optional, Callable, Tuple
 from utilities import wait_for_button
 
@@ -53,17 +53,21 @@ def gyro_turn(left_speed, right_speed, angle, stop_when_finished=True):
         :param stop_when_finished: Determines if the robot should stop when it finishes turning. Defaults to True.
     """
     check_init()
-    old_time = time.time()
+    start_time = old_time = time.time()
     drive(left_speed, right_speed)
     current_turned_angle = 0
     fixed_angle = abs(angle)-abs(right_speed-left_speed) * momentum_multiplier
-    while abs(current_turned_angle) < fixed_angle:
+    while abs(current_turned_angle) < fixed_angle and time.time() - start_time < 10:
         current_turned_angle += error_multiplier * gyroscope() * (time.time() - old_time) / 8
         old_time = time.time()
         msleep(10)
     if stop_when_finished:
         stop()
         msleep(500)
+    if time.time() - start_time > 10:
+        stop()
+        disable_servos()
+        raise Exception("Gyro Turn Timer Expired")
 
 
 def check_init():
