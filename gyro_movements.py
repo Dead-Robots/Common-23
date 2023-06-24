@@ -56,7 +56,7 @@ def gyro_turn(left_speed, right_speed, angle, stop_when_finished=True):
     old_time = time.time()
     drive(left_speed, right_speed)
     current_turned_angle = 0
-    fixed_angle = abs(angle)-abs(right_speed-left_speed) * momentum_multiplier
+    fixed_angle = abs(angle) - abs(right_speed - left_speed) * momentum_multiplier
     while abs(current_turned_angle) < fixed_angle:
         current_turned_angle += error_multiplier * gyroscope() * (time.time() - old_time) / 8
         old_time = time.time()
@@ -171,7 +171,7 @@ def gyro_turn_test(left_speed, right_speed, angle=90, iterations=1):
         msleep(1000)
 
 
-def straight_drive(speed, condition, stop_when_finished=True):
+def straight_drive(speed, condition, stop_when_finished=True, condition_is=True):
     """
     Drives straight at a given speed while an input condition is True.
 
@@ -183,6 +183,8 @@ def straight_drive(speed, condition, stop_when_finished=True):
         returns false.
 
     :param stop_when_finished: Determines if the robot should stop when it finishes driving. Defaults to True.
+
+    :param condition_is: Drive while the condition is `condition_is`
     """
     check_init()
     if abs(speed) < 20:
@@ -190,7 +192,7 @@ def straight_drive(speed, condition, stop_when_finished=True):
         print("Warning, speed is too slow, defaulting to 20.")
     previous_time = time.time()
     integral_error_adjustment = 0.0
-    while condition():
+    while condition() == condition_is:
 
         # Calculate adjustment values
         current_gyro = gyroscope()
@@ -246,13 +248,15 @@ def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=80
     with open(os.path.expanduser("~/straight.txt"), "w+") as file:
         file.write(
             str(abs((sum(get_motor_positions()) - start_position)
-                / (total_inches - robot_length_inches))))
+                    / (total_inches - robot_length_inches))))
     msleep(500)
     with open(os.path.expanduser("~/straight.txt")) as file:
         proportion = file.read()
     print(f"Straight drive distance calibrated. {proportion} ticks per inch.")
+    global straight_drive_distance_proportion
+    straight_drive_distance_proportion = proportion
     wait_for_button("Press button to drive halfway back")
-    straight_drive_distance(-1*copysign(speed, direction), (total_inches-robot_length_inches)/2)
+    straight_drive_distance(-1 * copysign(speed, direction), (total_inches - robot_length_inches) / 2)
     wait_for_button()
     gyro_turn(-80, 80, 180)
 
