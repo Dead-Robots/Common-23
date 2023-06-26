@@ -258,7 +258,7 @@ def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=80
         proportion = file.read()
     print(f"Straight drive distance calibrated. {proportion} ticks per inch.")
     global straight_drive_distance_proportion
-    straight_drive_distance_proportion = proportion
+    straight_drive_distance_proportion = float(proportion)
     wait_for_button("Press button to drive halfway back")
     straight_drive_distance(-1 * copysign(speed, direction), (total_inches - robot_length_inches) / 2)
     wait_for_button()
