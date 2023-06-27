@@ -57,17 +57,16 @@ def gyro_turn(left_speed, right_speed, angle, stop_when_finished=True):
     drive(left_speed, right_speed)
     current_turned_angle = 0
     fixed_angle = abs(angle) - abs(right_speed - left_speed) * momentum_multiplier
-    while abs(current_turned_angle) < fixed_angle and time.time() - start_time < 10:
+    while abs(current_turned_angle) < fixed_angle:
         current_turned_angle += error_multiplier * gyroscope() * (time.time() - old_time) / 8
         old_time = time.time()
+        if old_time - start_time > 10:
+            stop()
+            raise Exception("Gyro Turn Timer Expired.")
         msleep(10)
     if stop_when_finished:
         stop()
         msleep(500)
-    if time.time() - start_time > 10:
-        stop()
-        disable_servos()
-        raise Exception("Gyro Turn Timer Expired")
 
 
 def check_init():
