@@ -264,7 +264,7 @@ def calibrate_straight_drive_distance(robot_length_inches, direction=1, speed=80
     gyro_turn(-80, 80, 180)
 
 
-def straight_drive_distance(speed, inches, stop_when_finished=True):
+def straight_drive_distance(speed, inches, stop_when_finished=True, ramp=False):
     """
         Drives straight at a given speed for a given distance.
 
@@ -284,7 +284,29 @@ def straight_drive_distance(speed, inches, stop_when_finished=True):
         return abs(left + right - start_position) \
             < (abs(inches) - abs(distance_adjustment * (speed / 100.0))) * straight_drive_distance_proportion
 
-    straight_drive(speed, condition, stop_when_finished)
+    if not ramp:
+        straight_drive(speed, condition, stop_when_finished)
+    else:
+        if inches <= 12:
+            straight_drive_distance(speed // 5, inches / 9, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 4, inches / 9, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 3, inches / 9, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 2, inches / 9, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed, inches / 9, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 2, inches / 9, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 3, inches / 9, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 4, inches / 9, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 5, inches / 9, stop_when_finished=stop_when_finished, ramp=False)
+        if inches > 12:
+            straight_drive_distance(speed // 5, 1.5, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 4, 1.5, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 3, 1.5, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 2, 1.5, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed, inches - 12, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 2, 1.5, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 3, 1.5, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 4, 1.5, stop_when_finished=False, ramp=False)
+            straight_drive_distance(speed // 5, 1.5, stop_when_finished=stop_when_finished, ramp=False)
 
 
 def gyro_demo():
