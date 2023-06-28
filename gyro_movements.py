@@ -53,16 +53,16 @@ def gyro_turn(left_speed, right_speed, angle, stop_when_finished=True):
         :param stop_when_finished: Determines if the robot should stop when it finishes turning. Defaults to True.
     """
     check_init()
-    start_time = old_time = time.time()
+    start_time_ = old_time = time.time()
     drive(left_speed, right_speed)
     current_turned_angle = 0
     fixed_angle = abs(angle) - abs(right_speed - left_speed) * momentum_multiplier
     while abs(current_turned_angle) < fixed_angle:
         current_turned_angle += error_multiplier * gyroscope() * (time.time() - old_time) / 8
         old_time = time.time()
-        if old_time - start_time > 10:
+        if old_time - start_time_ > 10:
             stop()
-            raise Exception("Gyro Turn Timer Expired.")
+            raise Exception(f"Gyro Turn Timer Expired.\n{start_time_}\n{old_time}\n{time.time()}")
         msleep(10)
     if stop_when_finished:
         stop()
