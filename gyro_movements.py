@@ -190,9 +190,9 @@ def straight_drive(speed, condition, stop_when_finished=True, condition_is=True)
     :param condition_is: Drive while the condition is `condition_is`
     """
     check_init()
-    if abs(speed) < 20:
-        speed = 20 if speed > 0 else -20
-        print("Warning, speed is too slow, defaulting to 20.")
+    if abs(speed) < 15:
+        speed = 15 if speed > 0 else -15
+        print("Warning, speed is too slow, defaulting to 15.")
     previous_time = time.time()
     integral_error_adjustment = 0.0
     while condition() == condition_is:
