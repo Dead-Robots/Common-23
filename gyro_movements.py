@@ -1,9 +1,10 @@
 import time
 import os
 from math import copysign
-from kipr import msleep, gyro_z, disable_servos
+from kipr import gyro_z, disable_servos
 from typing import Optional, Callable, Tuple
 from utilities import wait_for_button
+from time import sleep
 
 error_multiplier = 1.0
 momentum_multiplier = 1.0
@@ -16,6 +17,10 @@ error_integral_multiplier = 1.0
 get_motor_positions: Optional[Callable[[], Tuple[int, int]]] = None
 push_sensor: Optional[Callable[[], bool]] = None
 distance_adjustment = 0.0
+
+
+def msleep(milliseconds):
+    sleep(milliseconds/1000)
 
 
 def calibrate_gyro():

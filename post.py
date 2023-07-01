@@ -1,6 +1,10 @@
 import os
+from time import sleep
+from kipr import a_button, b_button, c_button, push_button
 
-from kipr import a_button, b_button, c_button, msleep, push_button
+
+def msleep(milliseconds):
+    sleep(milliseconds/1000)
 
 
 def post_core(
