@@ -2,7 +2,7 @@ from kipr import push_button, msleep, console_clear, analog
 from time import time
 
 START_LIGHT_THRESHOLD = 0
-
+USE_BUTTON_INSTEAD = False
 
 def _calibrate(port):
     global START_LIGHT_THRESHOLD
@@ -46,7 +46,7 @@ def _wait_4(port, function=None, function_every=None):
     end_time = 0
     print("waiting for light!!", i)
     while i > 0:
-        if analog(port) < START_LIGHT_THRESHOLD:
+        if analog(port) < START_LIGHT_THRESHOLD or (push_button() and USE_BUTTON_INSTEAD):
             i = i - 1
             print("Countdown:", i)
         else:
@@ -62,8 +62,9 @@ def wait_4_light(port, ignore=False, function=None, function_every=None):
     if ignore:
         wait_for_button()
         return
-    while not _calibrate(port):
-        pass
+    if not USE_BUTTON_INSTEAD:
+        while not _calibrate(port):
+            pass
     _wait_4(port, function=function, function_every=function_every)
 
 
