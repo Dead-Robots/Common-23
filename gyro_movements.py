@@ -1,9 +1,8 @@
 import time
 import os
 from math import copysign
-from kipr import gyro_z, disable_servos
+from kipr import gyro_z, push_button
 from typing import Optional, Callable, Tuple
-from utilities import wait_for_button
 from time import sleep
 
 error_multiplier = 1.0
@@ -17,6 +16,14 @@ error_integral_multiplier = 1.0
 get_motor_positions: Optional[Callable[[], Tuple[int, int]]] = None
 push_sensor: Optional[Callable[[], bool]] = None
 distance_adjustment = 0.0
+
+
+def wait_for_button(text="waiting for button"):
+    stop()
+    print(text)
+    while not push_button():
+        msleep(50)
+    msleep(1000)
 
 
 def msleep(milliseconds):
