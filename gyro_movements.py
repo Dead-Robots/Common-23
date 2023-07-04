@@ -155,6 +155,7 @@ def gyro_init(drive_function, stop_function, get_motor_positions_function, push_
     msleep(500)
     calibrate_gyro()
     msleep(500)
+    print("Done calibrating gyro")
     drive = drive_function
     stop = stop_function
     error_multiplier = gyro_turn_error_adjustment
