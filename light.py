@@ -4,8 +4,10 @@ from time import time
 START_LIGHT_THRESHOLD = 0
 USE_BUTTON_INSTEAD = False
 
+
 def _calibrate(port):
     global START_LIGHT_THRESHOLD
+    light_on = 0
     while not push_button():
         light_on = analog(port)
         console_clear()
@@ -19,6 +21,7 @@ def _calibrate(port):
         print("Bad calibration")
         return False
     msleep(1000)
+    light_off = 3000
     while not push_button():
         console_clear()
         print("Press button with light off")
@@ -51,7 +54,7 @@ def _wait_4(port, function=None, function_every=None):
             print("Countdown:", i)
         else:
             i = 10
-        if time() - end_time > function_every and i == 10:
+        if function_every and time() - end_time > function_every and i == 10:
             function()
             end_time = time()
         else:
