@@ -51,9 +51,12 @@ def post_core(
                     print("POST complete.")
             except FileNotFoundError:
                 print("Aborting POST, straight.txt was not found.")
+            print("Press 'A' to run the robot.\nPress 'B' to re-run the POST\nPress 'C' to calibrate drive distances.")
         elif c:
             if calibration_function:
                 calibration_function()
+                print("Calibration completed.\n\nPress 'A' to run the robot."
+                      "\nPress 'B' to re-run the POST\nPress 'C' to calibrate drive distances.")
             else:
-                raise Exception("No calibration function provided.")
+                print("Aborting drive distance calibration, no calibration function was provided.")
     msleep(500)
