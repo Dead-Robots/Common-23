@@ -17,7 +17,7 @@ def _calibrate(port):
     while push_button():
         pass
 
-    if light_on > 200:
+    if light_on > 400:
         print("Bad calibration")
         return False
     msleep(1000)
