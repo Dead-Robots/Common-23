@@ -54,7 +54,7 @@ def _wait_4(port, function=None, function_every=None):
             print("Countdown:", i)
         else:
             i = 10
-        if function_every and time() - end_time > function_every and i == 10:
+        if function and function_every and time() - end_time > function_every and i == 10:
             function()
             end_time = time()
         else:
